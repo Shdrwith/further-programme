@@ -1,0 +1,76 @@
+grid = [[0, 2, 0, 0, 5, 0, 0, 0, 7],
+[0, 0, 0, 0, 0, 0, 4, 0, 0],
+[0, 0, 3, 0, 9, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 6, 0],
+[0, 0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+def solve_sudoku(grid):
+"""
+Recursive function to solve the Sudoku puzzle.
+:param grid: A list of lists representing the Sudoku grid
+:return: True if the Sudoku puzzle is solved, False otherwise
+"""
+# Find the next empty location in the grid
+row, col = find_empty_location(grid)
+
+# If there are no more empty locations, the puzzle is solved
+if row == -1 and col == -1:
+    return True
+
+# Find the viable options to fill the current empty location
+viable_options = get_viable_options(grid, row, col)
+
+# Try each viable option
+for option in viable_options:
+    grid[row][col] = option
+    
+    # Recursively try to fill the rest of the grid
+    if solve_sudoku(grid):
+        return True
+    
+    # If the recursive call did not solve the puzzle, backtrack and try the next option
+    grid[row][col] = 0
+
+# If no viable option worked, backtrack and try a different option in the previous empty location
+return False
+def find_empty_location(grid):
+"""
+Finds the next empty location in the grid.
+:param grid: A list of lists representing the Sudoku grid
+:return: A tuple representing the row and column of the next empty location, or (-1, -1) if there are no empty locations
+"""
+for row in range(len(grid)):
+for col in range(len(grid[0])):
+if grid[row][col] == 0:
+return row, col
+return -1, -1
+
+def get_viable_options(grid, row, col):
+"""
+Finds the viable options to fill the current empty location in the grid.
+:param grid: A list of lists representing the Sudoku grid
+:param row: The row of the current empty location
+:param col: The column of the current empty location
+:return: A list of viable options to fill the current empty location
+"""
+options = set(range(1, len(grid) + 1))
+# Eliminate values that are already in the corresponding row, column, and square
+for i in range(len(grid)):
+if grid[row][i] in options:
+options.remove(grid[row][i])
+if grid[i][col] in options:
+options.remove(grid[i][col])
+subgrid_size = int(len(grid) ** 0.5)
+subgrid_row = (row // subgrid_size) * subgrid_size
+subgrid_col = (col // subgrid_size) * subgrid_size
+for i in range(subgrid_row, subgrid_row + subgrid_size):
+for j in range(subgrid_col, subgrid_col + subgrid_size):
+if grid[i][j] in options:
+options.remove(grid[i][j])
+return list(options)
+
+print(solve_sudoku(grid))
